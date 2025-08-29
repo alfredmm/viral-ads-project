@@ -1,0 +1,9 @@
+{
+  "user_prompt": "futuristic tech",
+  "idea": "Amazing futuristic tech showcase with stunning visuals and emotional storytelling. Error: \n\nYou tried to access openai.ChatCompletion, but this is no longer supported in openai>=1.0.0 - see the README at https://github.com/openai/openai-python for the API.\n\nYou can run `openai migrate` to automatically upgrade your codebase to use the 1.0.0 interface. \n\nAlternatively, you can pin your installation to the old version, e.g. `pip install openai==0.28`\n\nA detailed migration guide is available here: https://github.com/openai/openai-python/discussions/742\n",
+  "script": "Visual showcase of Amazing futuristic tech showcase with stunning visuals and emotional storytelling. Error: \n\nYou tried to access openai.ChatCompletion, but this is no longer supported in openai>=1.0.0 - see the README at https://github.com/openai/openai-python for the API.\n\nYou can run `openai migrate` to automatically upgrade your codebase to use the 1.0.0 interface. \n\nAlternatively, you can pin your installation to the old version, e.g. `pip install openai==0.28`\n\nA detailed migration guide is available here: https://github.com/openai/openai-python/discussions/742\n with dynamic camera movements, emotional music, and compelling storytelling",
+  "timestamp": "20250829_111020",
+  "status": "idea_generated",
+  "video_file": "videos/ad_20250829_111020.mp4",
+  "audio_file": "audio/ad_20250829_111020.mp3"
+}

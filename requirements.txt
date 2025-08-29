@@ -1,0 +1,6 @@
+flask
+google-cloud-secret-manager
+requests
+openai>=1.0.0
+tweepy
+google-cloud-aiplatform

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Viral Ad Generator Pro</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 { 
+            text-align: center; 
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 2.5em;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            resize: vertical;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        button { 
+            padding: 15px 30px; 
+            font-size: 16px; 
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        button.secondary {
+            background: #2196F3;
+        }
+        button.secondary:hover {
+            background: #0b7dda;
+        }
+        .ad { 
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 25px; 
+            margin: 25px 0; 
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .video-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        video {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        .loading {
+            text-align: center;
+            padding: 30px;
+            display: none;
+            font-size: 18px;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #c62828;
+            display: none;
+        }
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #2e7d32;
+            display: none;
+        }
+        .ad-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .ad-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .virality-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px 5px;
+            color: white;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        }
+        .virality-80 { background: linear-gradient(45deg, #00b894, #00a085); }
+        .virality-60 { background: linear-gradient(45deg, #fdcb6e, #f39c12); }
+        .virality-40 { background: linear-gradient(45deg, #e17055, #d63031); }
+        .virality-0 { background: linear-gradient(45deg, #636e72, #2d3436); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Viral Ad Generator Pro</h1>
+        <p style="text-align: center; opacity: 0.9;">Powered by Twitter trends & AI virality optimization</p>
+        
+        <div class="form-group">
+            <textarea 
+                id="promptInput" 
+                placeholder="Enter your product or idea for a viral ad (min 8 seconds duration)..."
+            ></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button onclick="generateFromPrompt()">🚀 Generate from My Idea</button>
+            <button class="secondary" onclick="generateFromTwitter()">🐦 Use Viral Twitter Content</button>
+            <button onclick="listAds()">📋 My Generated Ads</button>
+        </div>
+        
+        <div id="loading" class="loading">
+            ⏳ AI is creating your viral ad masterpiece...
+        </div>
+        
+        <div id="error" class="error"></div>
+        <div id="success" class="success"></div>
+        
+        <div id="result"></div>
+        <div id="adsList" class="ad-grid"></div>
+    </div>
+
+    <script>
+        async function generateFromPrompt() {
+            const prompt = document.getElementById('promptInput').value.trim();
+            if (!prompt) {
+                showError('Please enter a prompt first!');
+                return;
+            }
+            
+            showLoading(true);
+            hideMessages();
+            
+            try {
+                const formData = new FormData();
+                formData.append('prompt', prompt);
+                
+                const response = await fetch('/generate-from-prompt', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const ad = await response.json();
+                
+                if (ad.error) {
+                    showError(ad.error);
+                } else {
+                    displayAd(ad);
+                    showSuccess('✅ Ad generated successfully!');
+                }
+            } catch (error) {
+                showError('Failed to generate ad. Please try again.');
+                console.error('Error:', error);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        async function generateFromTwitter() {
+            showLoading(true);
+            hideMessages();
+            
+            try {
+                const response = await fetch('/generate-from-twitter');
+                const ad = await response.json();
+                
+                if (ad.error) {
+                    showError(ad.error);
+                } else {
+                    displayAd(ad);
+                    showSuccess('✅ Ad generated from Twitter trends!');
+                }
+            } catch (error) {
+                showError('Failed to fetch viral content from Twitter.');
+                console.error('Error:', error);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function displayAd(ad) {
+            // Handle virality score display safely
+            const viralityScore = ad.virality_score || 50;
+            const viralityClass = `virality-${Math.floor(viralityScore / 20) * 20}`;
+            const duration = ad.duration_seconds || 15;
+            const assessment = ad.virality_assessment || 'Virality assessment not available';
+            
+            document.getElementById('result').innerHTML = `
+                <div class="ad">
+                    <h3>🎉 Your Viral Ad is Ready!</h3>
+                    
+                    <div class="virality-score">
+                        <span class="virality-badge ${viralityClass}">
+                            Virality Score: ${viralityScore}/100
+                        </span>
+                        <p><strong>${assessment}</strong></p>
+                    </div>
+                    
+                    <div class="video-container">
+                        <h4>📹 Generated Video Ad (${duration}s)</h4>
+                        <video controls>
+                            <source src="/video/${ad.video_file.split('/').pop()}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    
+                    <p><strong>Source:</strong> ${ad.source || 'User prompt'}</p>
+                    <p><strong>Ad Idea:</strong> ${ad.idea || 'No idea generated'}</p>
+                    <p><strong>Detailed Script:</strong> ${ad.script || 'No script generated'}</p>
+                    <p><strong>Generated:</strong> ${formatTimestamp(ad.timestamp)}</p>
+                </div>
+            `;
+        }
+        
+        async function listAds() {
+            showLoading(true);
+            hideMessages();
+            
+            try {
+                const response = await fetch('/list-ads');
+                const ads = await response.json();
+                
+                if (ads.error) {
+                    showError(ads.error);
+                } else {
+                    displayAdsList(ads);
+                    if (ads.length > 0) {
+                        showSuccess(`📊 Showing ${ads.length} generated ads`);
+                    }
+                }
+            } catch (error) {
+                showError('Failed to load ads.');
+                console.error('Error:', error);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function displayAdsList(ads) {
+            let html = '';
+            
+            if (!ads || ads.length === 0) {
+                html = '<div class="ad-card"><p>No ads generated yet. Create your first one!</p></div>';
+            } else {
+                ads.forEach(ad => {
+                    const viralityScore = ad.virality_score || 50;
+                    const viralityClass = `virality-${Math.floor(viralityScore / 20) * 20}`;
+                    const videoFilename = ad.video_file ? ad.video_file.split('/').pop() : 'placeholder.mp4';
+                    
+                    html += `
+                        <div class="ad-card">
+                            <h4>${(ad.user_prompt || ad.source || 'Unknown prompt').substring(0, 30)}...</h4>
+                            <div class="virality-badge ${viralityClass}">
+                                Score: ${viralityScore}/100
+                            </div>
+                            <video controls width="100%">
+                                <source src="/video/${videoFilename}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <p><strong>Idea:</strong> ${(ad.idea || 'No idea').substring(0, 80)}...</p>
+                            <p><strong>Generated:</strong> ${formatTimestamp(ad.timestamp)}</p>
+                            <button onclick="viewAdDetails('${ad.id}')">View Details</button>
+                        </div>
+                    `;
+                });
+            }
+            
+            document.getElementById('adsList').innerHTML = html;
+        }
+        
+        function viewAdDetails(adId) {
+            // Scroll to top and show details
+            document.getElementById('result').scrollIntoView();
+            // You could implement a detailed view here
+            showSuccess(`Viewing details for ad ${adId}`);
+        }
+        
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return "Unknown date";
+            
+            try {
+                if (timestamp.includes('_')) {
+                    const [datePart, timePart] = timestamp.split('_');
+                    const year = datePart.substring(0, 4);
+                    const month = datePart.substring(4, 6);
+                    const day = datePart.substring(6, 8);
+                    const hours = timePart.substring(0, 2);
+                    const minutes = timePart.substring(2, 4);
+                    const seconds = timePart.substring(4, 6);
+                    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+                }
+                return new Date(timestamp).toLocaleString();
+            } catch (e) {
+                return timestamp;
+            }
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+        
+        function hideMessages() {
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('success').style.display = 'none';
+        }
+        
+        // Allow pressing Enter to generate ad
+        document.getElementById('promptInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                generateFromPrompt();
+            }
+        });
+        
+        // Load ads on page load
+        window.addEventListener('load', function() {
+         
+        });
+    </script>
+</body>
+</html>

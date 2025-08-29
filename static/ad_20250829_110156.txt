@@ -1,0 +1,8 @@
+{
+  "trend": "AI technology",
+  "idea": "Amazing AI technology showcase with stunning visuals and emotional storytelling",
+  "script": "Visual showcase of Amazing AI technology showcase with stunning visuals and emotional storytelling with dynamic camera movements and emotional music",
+  "timestamp": "20250829_110156",
+  "video_file": "videos/ad_20250829_110156.mp4",
+  "audio_file": "audio/ad_20250829_110156.mp3"
+}
